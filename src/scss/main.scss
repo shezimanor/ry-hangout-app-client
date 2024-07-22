@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.button {
+  @apply flex w-8 flex-none items-center justify-center rounded disabled:opacity-50;
+  &.button--primary {
+    @apply bg-indigo-500 text-white enabled:hover:bg-indigo-700;
+  }
+}
+.message-container {
+  @apply flex-auto overflow-y-auto bg-green-100;
+  .message-container__list {
+    @apply flex w-full flex-col gap-y-2 p-2;
+    .message-container__item {
+      @apply self-start rounded-md bg-white px-4 py-2 text-neutral-600;
+    }
+  }
+}
