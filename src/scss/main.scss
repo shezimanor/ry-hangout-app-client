@@ -1,12 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.view-container {
+  @apply flex h-screen w-full flex-row items-stretch;
+}
+.view-center-container {
+  @apply flex h-screen w-full items-center justify-center;
+}
+
 .button {
   @apply flex w-8 flex-none items-center justify-center rounded disabled:opacity-50;
   &.button--primary {
     @apply bg-indigo-500 text-white enabled:hover:bg-indigo-700;
   }
 }
+
 .message-container {
   @apply flex-auto overflow-y-auto bg-green-100;
   .message-container__list {
@@ -16,9 +24,28 @@
     }
   }
 }
-.view-container {
-  @apply flex h-screen w-full flex-row items-stretch;
-}
-.view-center-container {
-  @apply flex h-screen w-full justify-center items-center;
+
+.toast-container {
+  @apply pointer-events-none fixed left-0 top-0 z-50 w-full;
+  .toast-container__list {
+    @apply flex w-full flex-col items-center gap-y-2 p-2;
+    .toast-container__item {
+      @apply rounded-md bg-neutral-800 px-4 py-2 text-white;
+      &.toast--primary {
+        @apply bg-indigo-500;
+      }
+      &.toast--success {
+        @apply bg-green-500;
+      }
+      &.toast--error {
+        @apply bg-red-500;
+      }
+      &.toast--warning {
+        @apply bg-yellow-500;
+      }
+      &.toast--info {
+        @apply bg-neutral-500;
+      }
+    }
+  }
 }
