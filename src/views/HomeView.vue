@@ -1,84 +1,54 @@
 <script setup lang="ts">
-import { io } from 'socket.io-client';
-import { computed, ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const socket = io('http://localhost:3000');
+import useGlobalStore from '@/stores/globalStore';
 
-const ioIsConnected = ref(false);
-const messageContainer = ref(null);
-const message = ref('');
-const messageList = ref<string[]>([]);
+// router
+const router = useRouter();
 
-// SocketIO 連線
-socket.on('connect', () => {
-  console.log(`Connected to SocketIO Server`);
-  // 連線確認
-  ioIsConnected.value = true;
-  // 註冊事件：伺服器送發的群組訊息
-  socket.on('group-message', handleGroupMessage);
-  // 註冊事件：伺服器送發的群組訊息
-  socket.on('user-in', handleUserJoin);
-  // 註冊事件：伺服器送發的群組訊息
-  socket.on('user-out', handleUserLeave);
-});
+// store(globalStore)
+const globalStore = useGlobalStore();
+const { userName } = storeToRefs(globalStore);
+const { updateUserName } = globalStore;
 
-// SocketIO 斷線
-socket.on('disconnect', () => {
-  console.log('Disconnected from server');
-  // 斷線確認
-  ioIsConnected.value = false;
-});
-
-// Computed
-const isSendable = computed(() => ioIsConnected.value && message.value.length > 0);
+const currentUser = ref('');
 
 // Methods
 function onSubmit(evt: Event) {
   evt.preventDefault();
 }
-function onSendMessage() {
-  if (!isSendable.value) return;
-  console.log('onSendMessage');
-  // 發送事件：群組訊息
-  socket.emit('group-message', message.value);
-  // 清空訊息
-  message.value = '';
+function onCreateUser() {
+  updateUserName(currentUser.value);
+  router.push({
+    name: 'ChatPage'
+  });
 }
-function handleGroupMessage(msg: string) {
-  messageList.value.push(msg);
-}
-function handleUserJoin(id: string) {
-  alert(`New user join, id: ${id}`);
-}
-function handleUserLeave(id: string) {
-  alert(`A user leave, id: ${id}`);
-}
+
+// Mounted
+onMounted(() => {
+  if (userName.value.length > 0) currentUser.value = userName.value;
+});
 </script>
 
 <template>
-  <div class="flex h-screen w-full flex-row items-stretch">
-    <!-- 主欄 -->
-    <div class="main-room flex flex-auto flex-col">
-      <div ref="messageContainer" class="message-container">
-        <ul class="message-container__list">
-          <li class="message-container__item" v-for="(item, index) in messageList" :key="index">
-            {{ item }}
-          </li>
-        </ul>
-      </div>
-      <form class="flex h-8 flex-none items-stretch" action="" @submit="onSubmit">
-        <AppInput type="text" v-model="message" @enter-up="onSendMessage" />
-        <button
-          class="button button--primary"
-          type="button"
-          :disabled="message === ''"
-          @click="onSendMessage"
-        >
-          <span class="icon-[material-symbols--send-rounded] h-6 w-6"></span>
-        </button>
-      </form>
-    </div>
-    <!-- 右側欄 -->
-    <div class="right-bar w-64 flex-none bg-red-100"></div>
+  <div class="view-center-container">
+    <form class="flex h-8 flex-none items-stretch gap-x-2" action="" @submit="onSubmit">
+      <AppInput
+        type="text"
+        placeholder="請輸入你的名字"
+        v-model="currentUser"
+        @enter-up="onCreateUser"
+      />
+      <button
+        class="button button--primary"
+        type="button"
+        :disabled="currentUser === ''"
+        @click="onCreateUser"
+      >
+        <span class="icon-[material-symbols--send-rounded] h-6 w-6"></span>
+      </button>
+    </form>
   </div>
 </template>

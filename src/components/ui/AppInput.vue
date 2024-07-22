@@ -2,7 +2,7 @@
 // vueuse: Shorthand for v-model binding, props + emit -> ref
 import { useVModel } from '@vueuse/core';
 // Vue
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 // Ref
 const elInput = ref(null);
@@ -31,11 +31,6 @@ const props = defineProps({
     type: String,
     default: ''
   }
-});
-
-// computed
-const isDisabled = computed(() => {
-  return props.disabled;
 });
 
 // defineEmits: 物件形式可以做送出事件前的驗證

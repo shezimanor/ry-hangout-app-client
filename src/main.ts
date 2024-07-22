@@ -1,7 +1,7 @@
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 
-import registerComponent from './plugins/register-component';
+import registerComponent from './plugins/registerComponent';
 
 import App from './App.vue';
 import router from './router';
