@@ -3,6 +3,8 @@ import { storeToRefs } from 'pinia';
 import { io } from 'socket.io-client';
 import { computed, ref } from 'vue';
 
+import type { Message } from '@/types';
+
 import useGlobalStore from '@/stores/globalStore';
 import useToastStore from '@/stores/toastStore';
 
@@ -19,7 +21,7 @@ const socket = io('http://localhost:3000');
 const ioIsConnected = ref(false);
 const messageContainer = ref(null);
 const message = ref('');
-const messageList = ref<string[]>([]);
+const messageList = ref<Message[]>([]);
 
 // SocketIO 連線
 socket.on('connect', () => {
@@ -55,12 +57,19 @@ function onSubmit(evt: Event) {
 function onSendMessage() {
   if (!isSendable.value) return;
   console.log('onSendMessage');
+  const currentMsg: Message = {
+    userId: userId.value,
+    userName: userName.value,
+    content: message.value
+  };
+  // 自行將訊息傳入 messageList（因為該事件發送後不會回傳給自己，所以要自己把訊息渲染出來）
+  handleGroupMessage(currentMsg);
   // 發送事件：群組訊息
-  socket.emit('group-message', message.value);
+  socket.emit('group-message', currentMsg);
   // 清空訊息
   message.value = '';
 }
-function handleGroupMessage(msg: string) {
+function handleGroupMessage(msg: Message) {
   messageList.value.push(msg);
 }
 function handleUserJoin(userName: string) {
@@ -85,8 +94,28 @@ function handleUserLeave(userName: string) {
     <div class="main-room flex flex-auto flex-col">
       <div ref="messageContainer" class="message-container">
         <ul class="message-container__list">
-          <li class="message-container__item" v-for="(item, index) in messageList" :key="index">
-            {{ item }}
+          <li
+            v-for="(message, index) in messageList"
+            :key="index"
+            class="message-container__item"
+            :class="[message.userId === userId ? 'item--end' : 'item--start']"
+          >
+            <!-- 其他人的訊息 -->
+            <template v-if="message.userId !== userId">
+              <span class="message-cotainer__avatar">
+                {{ message.userName.substring(0, 1) }}
+              </span>
+              <div class="message-cotainer__dialog">
+                <span class="message-cotainer__name">{{ message.userName }}</span>
+                <span class="message-cotainer__content">{{ message.content }}</span>
+              </div>
+            </template>
+            <!-- 本人的訊息 -->
+            <template v-else>
+              <div class="message-cotainer__dialog">
+                <span class="message-cotainer__content">{{ message.content }}</span>
+              </div>
+            </template>
           </li>
         </ul>
       </div>

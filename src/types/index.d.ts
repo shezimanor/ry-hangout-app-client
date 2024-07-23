@@ -4,3 +4,8 @@ export interface Toast {
   timeout: number; // ms
   content: string;
 }
+export interface Message {
+  userId: string;
+  userName: string;
+  content: string;
+}
