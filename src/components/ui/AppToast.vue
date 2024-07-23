@@ -36,5 +36,5 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="toast-container__item" :class="[typeClass]">{{ toast.id }}: {{ toast.content }}</div>
+  <div class="toast-container__item" :class="[typeClass]">{{ toast.content }}</div>
 </template>

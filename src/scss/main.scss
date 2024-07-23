@@ -32,19 +32,19 @@
     .toast-container__item {
       @apply rounded-md bg-neutral-800 px-4 py-2 text-white;
       &.toast--primary {
-        @apply bg-indigo-500;
+        @apply bg-indigo-400;
       }
       &.toast--success {
-        @apply bg-green-500;
+        @apply bg-emerald-400;
       }
       &.toast--error {
-        @apply bg-red-500;
+        @apply bg-rose-400;
       }
       &.toast--warning {
-        @apply bg-yellow-500;
+        @apply bg-yellow-400;
       }
       &.toast--info {
-        @apply bg-neutral-500;
+        @apply bg-neutral-400;
       }
     }
   }
