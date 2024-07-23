@@ -4,11 +4,15 @@ import { io } from 'socket.io-client';
 import { computed, ref } from 'vue';
 
 import useGlobalStore from '@/stores/globalStore';
+import useToastStore from '@/stores/toastStore';
 
 // store(globalStore)
 const globalStore = useGlobalStore();
 const { userName, userId } = storeToRefs(globalStore);
 const { updateUserId } = globalStore;
+// store(toastStore)
+const toastStore = useToastStore();
+const { addToast } = toastStore;
 
 const socket = io('http://localhost:3000');
 
@@ -24,6 +28,8 @@ socket.on('connect', () => {
   ioIsConnected.value = true;
   // 新增 id
   if (socket.id) updateUserId(socket.id);
+  // 發送事件：使用者名稱進入
+  socket.emit('user-in', userName.value);
   // 註冊事件：伺服器送發的群組訊息
   socket.on('group-message', handleGroupMessage);
   // 註冊事件：伺服器送發的群組訊息
@@ -57,11 +63,19 @@ function onSendMessage() {
 function handleGroupMessage(msg: string) {
   messageList.value.push(msg);
 }
-function handleUserJoin(id: string) {
-  alert(`New user join, id: ${id}`);
+function handleUserJoin(userName: string) {
+  addToast({
+    content: `${userName} 進入群組`,
+    type: 'primary',
+    timeout: 3600
+  });
 }
-function handleUserLeave(id: string) {
-  alert(`A user leave, id: ${id}`);
+function handleUserLeave(userName: string) {
+  addToast({
+    content: `${userName} 離開群組`,
+    type: 'info',
+    timeout: 3600
+  });
 }
 </script>
 
