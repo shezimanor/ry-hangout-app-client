@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 // vueuse: Shorthand for v-model binding, props + emit -> ref
 import { useVModel } from '@vueuse/core';
 // Vue
@@ -41,12 +41,18 @@ const emit = defineEmits({
 });
 
 // methods
-function onInput(event) {
+function onInput(event: Event) {
+  if (!(event instanceof InputEvent)) return;
   if (event.isComposing) {
     isComposing.value = true;
     return;
+  } else {
+    isComposing.value = false;
   }
-  inputValue.value = event.target.value;
+  const target = event.target;
+  if (target instanceof HTMLInputElement) {
+    inputValue.value = target.value;
+  }
 }
 function onEnter() {
   if (!isComposing.value) {
