@@ -9,3 +9,8 @@ export interface Message {
   userName: string;
   content: string;
 }
+
+export interface User {
+  id: string;
+  name: string;
+}

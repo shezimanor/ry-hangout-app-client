@@ -16,7 +16,7 @@ const props = defineProps({
   },
   modelValue: {
     // 綁 v-model 的內建參數名稱
-    type: String,
+    type: [String, Number],
     default: ''
   },
   placeholder: {
@@ -34,15 +34,16 @@ const props = defineProps({
 });
 
 // defineEmits: 物件形式可以做送出事件前的驗證
-const emit = defineEmits({
-  // xxx: null 不需要驗證
-  'update:modelValue': null,
-  'enter-up': null
-});
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string | number): void;
+  (e: 'enter-up'): void;
+  (e: 'input', value: Event): void;
+}>();
 
 // methods
 function onInput(event: Event) {
   if (!(event instanceof InputEvent)) return;
+  emit('input', event);
   if (event.isComposing) {
     isComposing.value = true;
     return;

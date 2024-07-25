@@ -1,9 +1,13 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 export default defineStore('globalStore', () => {
   const userName = ref('');
   const userId = ref('');
+  const user = computed(() => ({
+    id: userId.value,
+    name: userName.value
+  }));
   function updateUserName(newValue: string) {
     userName.value = newValue;
   }
@@ -16,6 +20,7 @@ export default defineStore('globalStore', () => {
     userName,
     userId,
     // getters
+    user,
     // actions
     updateUserName,
     updateUserId

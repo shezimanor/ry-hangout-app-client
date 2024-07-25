@@ -15,10 +15,14 @@
   }
 }
 
+.chat-container {
+  @apply flex flex-auto flex-col bg-green-100 p-4 pb-8;
+}
+
 .message-container {
-  @apply flex-auto overflow-y-auto bg-green-100;
+  @apply flex-auto overflow-y-auto;
   .message-container__list {
-    @apply flex w-full flex-col gap-y-3 p-4;
+    @apply flex w-full flex-col gap-y-3;
     .message-container__item {
       @apply flex flex-row gap-x-2;
       &.item--start {
@@ -41,6 +45,13 @@
         }
       }
     }
+  }
+}
+
+.input-container {
+  @apply relative flex h-14 flex-none items-stretch gap-x-2 rounded-md bg-neutral-50 p-3;
+  .input-container__status {
+    @apply absolute -bottom-5 left-0 text-xs text-neutral-400;
   }
 }
 

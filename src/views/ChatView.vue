@@ -3,14 +3,14 @@ import { storeToRefs } from 'pinia';
 import { io } from 'socket.io-client';
 import { computed, ref } from 'vue';
 
-import type { Message } from '@/types';
+import type { Message, User } from '@/types';
 
 import useGlobalStore from '@/stores/globalStore';
 import useToastStore from '@/stores/toastStore';
 
 // store(globalStore)
 const globalStore = useGlobalStore();
-const { userName, userId } = storeToRefs(globalStore);
+const { userName, userId, user } = storeToRefs(globalStore);
 const { updateUserId } = globalStore;
 // store(toastStore)
 const toastStore = useToastStore();
@@ -21,6 +21,7 @@ const socket = io('http://localhost:3000');
 const ioIsConnected = ref(false);
 const messageContainer = ref(null);
 const message = ref('');
+const typingStatus = ref('');
 const messageList = ref<Message[]>([]);
 
 // SocketIO 連線
@@ -34,10 +35,14 @@ socket.on('connect', () => {
   socket.emit('user-in', userName.value);
   // 註冊事件：伺服器送發的群組訊息
   socket.on('group-message', handleGroupMessage);
-  // 註冊事件：伺服器送發的群組訊息
+  // 註冊事件：使用者進入群組
   socket.on('user-in', handleUserJoin);
-  // 註冊事件：伺服器送發的群組訊息
+  // 註冊事件：使用者離開群組
   socket.on('user-out', handleUserLeave);
+  // 註冊事件：使用者進入打字狀態
+  socket.on('user-typing', handleUserTyping);
+  // 註冊事件：使用者取消打字狀態
+  socket.on('user-not-typing', handleUserNotTyping);
 });
 
 // SocketIO 斷線
@@ -54,6 +59,16 @@ const isSendable = computed(() => ioIsConnected.value && message.value.length > 
 function onSubmit(evt: Event) {
   evt.preventDefault();
 }
+function onTyping(event: Event) {
+  console.log('onTyping');
+  // 發送事件：使用者輸入訊息中
+  socket.emit('user-typing', user.value);
+}
+function onBlur(event: FocusEvent) {
+  console.log('Blur event:', event);
+  // 發送事件：使用者取消輸入訊息
+  socket.emit('user-not-typing', user.value);
+}
 function onSendMessage() {
   if (!isSendable.value) return;
   console.log('onSendMessage');
@@ -68,6 +83,8 @@ function onSendMessage() {
   socket.emit('group-message', currentMsg);
   // 清空訊息
   message.value = '';
+  // 發送事件：使用者取消輸入訊息
+  socket.emit('user-not-typing', user.value);
 }
 function handleGroupMessage(msg: Message) {
   messageList.value.push(msg);
@@ -86,12 +103,19 @@ function handleUserLeave(userName: string) {
     timeout: 3600
   });
 }
+function handleUserTyping(user: User) {
+  console.log('handleUserTyping', user);
+  typingStatus.value = `${user.name} 正在輸入訊息中...`;
+}
+function handleUserNotTyping(user: User) {
+  typingStatus.value = '';
+}
 </script>
 
 <template>
   <div class="view-container">
     <!-- 主欄 -->
-    <div class="main-room flex flex-auto flex-col">
+    <div class="chat-container">
       <div ref="messageContainer" class="message-container">
         <ul class="message-container__list">
           <li
@@ -119,8 +143,14 @@ function handleUserLeave(userName: string) {
           </li>
         </ul>
       </div>
-      <form class="flex h-8 flex-none items-stretch" action="" @submit="onSubmit">
-        <AppInput type="text" v-model="message" @enter-up="onSendMessage" />
+      <form class="input-container" action="" @submit="onSubmit">
+        <AppInput
+          type="text"
+          v-model="message"
+          @input="onTyping"
+          @blur="onBlur"
+          @enter-up="onSendMessage"
+        />
         <button
           class="button button--primary"
           type="button"
@@ -129,6 +159,8 @@ function handleUserLeave(userName: string) {
         >
           <span class="icon-[material-symbols--send-rounded] h-6 w-6"></span>
         </button>
+        <!-- 打字狀態列 -->
+        <span class="input-container__status">{{ typingStatus }}</span>
       </form>
     </div>
     <!-- 右側欄 -->
