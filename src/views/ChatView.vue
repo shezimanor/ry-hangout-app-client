@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia';
 import { io } from 'socket.io-client';
 import { computed, ref } from 'vue';
 
-import type { Message, User } from '@/types';
+import type { Message, User, Users } from '@/types';
 
 import useGlobalStore from '@/stores/globalStore';
 import useToastStore from '@/stores/toastStore';
@@ -22,6 +22,7 @@ const ioIsConnected = ref(false);
 const messageContainer = ref(null);
 const message = ref('');
 const typingStatus = ref('');
+const userList = ref<Users>({});
 const messageList = ref<Message[]>([]);
 
 // SocketIO 連線
@@ -39,6 +40,8 @@ socket.on('connect', () => {
   socket.on('user-in', handleUserJoin);
   // 註冊事件：使用者離開群組
   socket.on('user-out', handleUserLeave);
+  // 註冊事件：群組使用者清單更新
+  socket.on('user-list', handleUserList);
   // 註冊事件：使用者進入打字狀態
   socket.on('user-typing', handleUserTyping);
   // 註冊事件：使用者取消打字狀態
@@ -105,10 +108,13 @@ function handleUserLeave(userName: string) {
 }
 function handleUserTyping(user: User) {
   console.log('handleUserTyping', user);
-  typingStatus.value = `${user.name} 正在輸入訊息中...`;
+  typingStatus.value = `${user.name} 正在輸入文字`;
 }
 function handleUserNotTyping(user: User) {
   typingStatus.value = '';
+}
+function handleUserList(users: Users) {
+  userList.value = users;
 }
 </script>
 
@@ -167,6 +173,11 @@ function handleUserNotTyping(user: User) {
     <div class="right-bar flex w-64 flex-none flex-col bg-red-100">
       <span>Name: {{ userName }}</span>
       <span>ID: {{ userId }}</span>
+      <ul>
+        <li v-for="(userName, key) in userList" :key="key">
+          {{ userName }}
+        </li>
+      </ul>
     </div>
   </div>
 </template>
