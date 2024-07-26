@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { debounce } from 'lodash-es';
 import { storeToRefs } from 'pinia';
 import { io } from 'socket.io-client';
 import { computed, ref } from 'vue';
 
-import type { Message, User, Users } from '@/types';
+import type { Message, Users } from '@/types';
 
 import useGlobalStore from '@/stores/globalStore';
 import useToastStore from '@/stores/toastStore';
@@ -42,10 +43,8 @@ socket.on('connect', () => {
   socket.on('user-out', handleUserLeave);
   // 註冊事件：群組使用者清單更新
   socket.on('user-list', handleUserList);
-  // 註冊事件：使用者進入打字狀態
-  socket.on('user-typing', handleUserTyping);
-  // 註冊事件：使用者取消打字狀態
-  socket.on('user-not-typing', handleUserNotTyping);
+  // 註冊事件：更新使用者打字狀態
+  socket.on('user-typing-status', handleUserTyping);
 });
 
 // SocketIO 斷線
@@ -59,18 +58,22 @@ socket.on('disconnect', () => {
 const isSendable = computed(() => ioIsConnected.value && message.value.length > 0);
 
 // Methods
+const onTyping = debounce(
+  () => {
+    console.log('onTyping');
+    // 發送事件：使用者輸入訊息中
+    socket.emit('user-typing');
+  },
+  1000,
+  { leading: true }
+);
 function onSubmit(evt: Event) {
   evt.preventDefault();
-}
-function onTyping(event: Event) {
-  console.log('onTyping');
-  // 發送事件：使用者輸入訊息中
-  socket.emit('user-typing', user.value);
 }
 function onBlur(event: FocusEvent) {
   console.log('Blur event:', event);
   // 發送事件：使用者取消輸入訊息
-  socket.emit('user-not-typing', user.value);
+  socket.emit('user-not-typing');
 }
 function onSendMessage() {
   if (!isSendable.value) return;
@@ -87,7 +90,7 @@ function onSendMessage() {
   // 清空訊息
   message.value = '';
   // 發送事件：使用者取消輸入訊息
-  socket.emit('user-not-typing', user.value);
+  socket.emit('user-not-typing');
 }
 function handleGroupMessage(msg: Message) {
   messageList.value.push(msg);
@@ -106,12 +109,22 @@ function handleUserLeave(userName: string) {
     timeout: 3600
   });
 }
-function handleUserTyping(user: User) {
-  console.log('handleUserTyping', user);
-  typingStatus.value = `${user.name} 正在輸入文字`;
-}
-function handleUserNotTyping(user: User) {
-  typingStatus.value = '';
+function handleUserTyping(users: Users) {
+  const typingUsers = Object.values(users);
+  switch (typingUsers.length) {
+    case 0:
+      typingStatus.value = '';
+      break;
+    case 1:
+      typingStatus.value = `${typingUsers[0]} 正在打字`;
+      break;
+    case 2:
+      typingStatus.value = `${typingUsers[0]}和${typingUsers[1]} 正在打字`;
+      break;
+    default:
+      typingStatus.value = `多位使用者 正在打字`;
+      break;
+  }
 }
 function handleUserList(users: Users) {
   userList.value = users;
