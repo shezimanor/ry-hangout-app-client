@@ -23,7 +23,7 @@ body {
 }
 
 .message-container {
-  @apply flex-auto overflow-y-auto;
+  @apply flex-auto overflow-y-auto pb-4;
   .message-container__list {
     @apply flex w-full flex-col gap-y-3;
     .message-container__item {

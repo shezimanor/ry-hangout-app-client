@@ -2,7 +2,7 @@
 import { debounce } from 'lodash-es';
 import { storeToRefs } from 'pinia';
 import { io } from 'socket.io-client';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 
 import type { Message, Users } from '@/types';
 
@@ -20,7 +20,7 @@ const { addToast } = toastStore;
 const socket = io('http://localhost:3000');
 
 const ioIsConnected = ref(false);
-const messageContainer = ref(null);
+const messageContainer = ref<HTMLElement | null>(null);
 const message = ref('');
 const typingStatus = ref('');
 const userList = ref<Users>({});
@@ -89,11 +89,27 @@ function onSendMessage() {
   socket.emit('group-message', currentMsg);
   // 清空訊息
   message.value = '';
+  // 取消延遲中的 typing 事件
+  onTyping.cancel();
   // 發送事件：使用者取消輸入訊息
   socket.emit('user-not-typing');
 }
 function handleGroupMessage(msg: Message) {
   messageList.value.push(msg);
+  // 更新畫面後再捲動
+  nextTick(() => {
+    const messageContainerEl = messageContainer.value;
+    if (
+      messageContainerEl !== null &&
+      messageContainerEl.scrollHeight > messageContainerEl.offsetHeight
+    ) {
+      messageContainerEl.scrollTo({
+        left: 0,
+        top: messageContainerEl.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  });
 }
 function handleUserJoin(userName: string) {
   addToast({
