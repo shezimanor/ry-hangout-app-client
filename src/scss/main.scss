@@ -1,6 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+body {
+  @apply text-neutral-600;
+}
 .view-container {
   @apply flex h-screen w-full flex-row items-stretch;
 }
@@ -58,7 +61,7 @@
 .toast-container {
   @apply pointer-events-none fixed left-0 top-0 z-50 w-full;
   .toast-container__list {
-    @apply flex w-full flex-col items-center gap-y-2 p-2;
+    @apply relative flex w-full flex-col items-center gap-y-2 p-2;
     .toast-container__item {
       @apply rounded-md bg-neutral-800 px-4 py-2 text-white;
       &.toast--primary {
@@ -77,5 +80,22 @@
         @apply bg-neutral-400;
       }
     }
+  }
+}
+
+.right-bar {
+  @apply flex w-64 flex-none flex-col gap-y-4 bg-neutral-100 p-4;
+}
+
+.online-container {
+  @apply flex flex-col gap-y-2;
+  .online-container__title {
+    @apply text-xl;
+  }
+  .online-container__list {
+    @apply relative flex flex-col;
+  }
+  .online-container__item {
+    @apply h-6;
   }
 }

@@ -183,14 +183,12 @@ function handleUserList(users: Users) {
       </form>
     </div>
     <!-- 右側欄 -->
-    <div class="right-bar flex w-64 flex-none flex-col bg-red-100">
-      <span>Name: {{ userName }}</span>
-      <span>ID: {{ userId }}</span>
-      <ul>
-        <li v-for="(userName, key) in userList" :key="key">
-          {{ userName }}
-        </li>
-      </ul>
+    <div class="right-bar">
+      <div class="flex flex-col">
+        <span>Name: {{ userName }}</span>
+        <span>ID: {{ userId }}</span>
+      </div>
+      <AppOnlineList :userList="userList" />
     </div>
   </div>
 </template>

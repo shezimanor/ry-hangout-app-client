@@ -40,6 +40,7 @@ onMounted(() => {
         placeholder="請輸入你的名字"
         v-model="currentUser"
         @enter-up="onCreateUser"
+        autofocus="true"
       />
       <button
         class="button button--primary"
