@@ -95,6 +95,7 @@ function onSendMessage() {
   socket.emit('user-not-typing');
 }
 function handleGroupMessage(msg: Message) {
+  // 加入新的訊息
   messageList.value.push(msg);
   // 更新畫面後再捲動
   nextTick(() => {
@@ -204,7 +205,9 @@ function handleUserList(users: Users) {
         <span>Name: {{ userName }}</span>
         <span>ID: {{ userId }}</span>
       </div>
-      <AppOnlineList :userList="userList" />
+      <AppOnlineList :user-list="userList" :current-user-id="userId" />
+      <!-- 私訊子路由測試元件 -->
+      <RouterView />
     </div>
   </div>
 </template>

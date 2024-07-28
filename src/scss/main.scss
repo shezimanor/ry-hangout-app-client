@@ -12,7 +12,7 @@ body {
 }
 
 .button {
-  @apply flex w-8 flex-none items-center justify-center rounded disabled:opacity-50;
+  @apply flex h-8 w-8 flex-none items-center justify-center rounded disabled:opacity-50;
   &.button--primary {
     @apply bg-indigo-500 text-white enabled:hover:bg-indigo-700;
   }
@@ -32,7 +32,7 @@ body {
         @apply justify-start;
       }
       &.item--end {
-        @apply justify-end;
+        @apply justify-end pl-11;
       }
 
       .message-cotainer__avatar {
@@ -44,7 +44,7 @@ body {
           @apply text-xs text-neutral-500;
         }
         .message-cotainer__content {
-          @apply self-start rounded-md bg-white px-2 py-1 text-base text-neutral-600;
+          @apply self-start rounded-md bg-white px-3 py-2 text-base text-neutral-600;
         }
       }
     }
@@ -96,6 +96,6 @@ body {
     @apply relative flex flex-col;
   }
   .online-container__item {
-    @apply h-6;
+    @apply flex h-10 flex-row items-center gap-x-2 py-1;
   }
 }

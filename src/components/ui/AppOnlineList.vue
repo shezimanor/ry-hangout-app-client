@@ -1,9 +1,15 @@
 <script lang="ts" setup>
+import { useRouter } from 'vue-router';
+
 import type { Users } from '@/types';
+
+// router
+const router = useRouter();
 
 // Props
 defineProps<{
   userList: Users;
+  currentUserId: string;
 }>();
 </script>
 
@@ -18,6 +24,21 @@ defineProps<{
         :style="`top: ${index * 24}px;`"
       >
         {{ user }}
+        <button
+          v-if="id !== currentUserId"
+          class="button button--primary"
+          type="button"
+          @click="
+            router.push({
+              name: 'PrivateChatPage',
+              params: {
+                id
+              }
+            })
+          "
+        >
+          <span class="icon-[material-symbols--chat-rounded] h-6 w-6"></span>
+        </button>
       </li>
     </TransitionGroup>
   </div>
