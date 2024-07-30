@@ -1,16 +1,39 @@
 <script lang="ts" setup>
+import { storeToRefs } from 'pinia';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import type { Users } from '@/types';
 
+import useGlobalStore from '@/stores/globalStore';
+import useSocketStore from '@/stores/socketStore';
+
+// Stores
+const globalStore = useGlobalStore();
+const socketStore = useSocketStore();
+const { userId } = storeToRefs(globalStore);
+const { socketOnEvent, socketOffEvent } = socketStore;
+
+const userList = ref<Users>({});
+
 // router
 const router = useRouter();
 
-// Props
-defineProps<{
-  userList: Users;
-  currentUserId: string;
-}>();
+// Moethods
+function handleUserList(users: Users) {
+  userList.value = users;
+}
+
+// Hooks
+onMounted(() => {
+  console.log('AppOnlineList onMounted');
+  // 註冊事件：群組使用者清單更新
+  socketOnEvent('user-list', handleUserList);
+});
+onBeforeUnmount(() => {
+  // 註銷事件：群組使用者清單更新
+  socketOffEvent('user-list', handleUserList);
+});
 </script>
 
 <template>
@@ -25,12 +48,12 @@ defineProps<{
       >
         {{ user }}
         <button
-          v-if="id !== currentUserId"
+          v-if="id !== userId"
           class="button button--primary"
           type="button"
           @click="
             router.push({
-              name: 'PrivateChatPage',
+              name: 'ChatPrivatePage',
               params: {
                 id
               }

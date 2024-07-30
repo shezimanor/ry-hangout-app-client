@@ -22,7 +22,7 @@ function onSubmit(evt: Event) {
 function onCreateUser() {
   updateUserName(currentUser.value);
   router.push({
-    name: 'ChatPage'
+    name: 'ChatGroupPage'
   });
 }
 

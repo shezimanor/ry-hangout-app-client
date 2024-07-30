@@ -1,7 +1,6 @@
 import { storeToRefs } from 'pinia';
 import { createRouter, createWebHistory } from 'vue-router';
 
-import AppTest from '@/components/ui/AppTest.vue';
 import useGlobalStore from '@/stores/globalStore';
 import HomeView from '@/views/HomeView.vue';
 
@@ -21,7 +20,19 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/ChatView.vue'),
       meta: { auth: true },
-      children: [{ path: ':id', name: 'PrivateChatPage', component: AppTest }]
+      children: [
+        {
+          path: 'group',
+          name: 'ChatGroupPage',
+          component: () => import('../views/ChatGroupView.vue')
+        },
+        {
+          path: ':id',
+          name: 'ChatPrivatePage',
+          component: () => import('../views/ChatPrivateView.vue'),
+          props: true
+        }
+      ]
     }
   ]
 });
