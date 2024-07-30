@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import type { Users } from '@/types';
 
@@ -17,6 +17,7 @@ const { socketOnEvent, socketOffEvent } = socketStore;
 const userList = ref<Users>({});
 
 // router
+const route = useRoute();
 const router = useRouter();
 
 // Moethods
@@ -39,6 +40,18 @@ onBeforeUnmount(() => {
 <template>
   <div class="online-container">
     <h3 class="online-container__title">群組成員：</h3>
+    <button
+      v-if="route.name !== 'ChatGroupPage'"
+      class="button button--primary"
+      type="button"
+      @click="
+        router.push({
+          name: 'ChatGroupPage'
+        })
+      "
+    >
+      <span class="icon-[material-symbols--groups-rounded] h-6 w-6"></span>
+    </button>
     <TransitionGroup tag="ul" name="online-list" class="online-container__list">
       <li
         v-for="(user, id, index) in userList"

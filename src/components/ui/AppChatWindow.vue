@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useStorage } from '@vueuse/core';
 import { debounce } from 'lodash-es';
 import { storeToRefs } from 'pinia';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, toRefs } from 'vue';
@@ -26,11 +27,16 @@ const { socketEmitEvent, socketOnEvent, socketOffEvent } = socketStore;
 const messageContainer = ref<HTMLElement | null>(null);
 const message = ref('');
 const typingStatus = ref('');
-const messageList = ref<Message[]>([]);
+// const messageList = ref<Message[]>([]);
 
 // Computed
 const isSendable = computed(() => socketIsConnected.value && message.value.length > 0);
 const messageEventName = computed(() => `${mode.value}-message`);
+const storageKey = computed(() =>
+  mode.value === 'group' ? 'group' : [userId.value, receiverId.value].sort().join('_')
+);
+
+const messageList = useStorage<Message[]>(storageKey.value, [], sessionStorage);
 
 // Methods
 const onTyping = debounce(
@@ -118,6 +124,7 @@ onMounted(() => {
   socketOnEvent('user-typing-status', handleUserTyping);
   // 註冊事件：伺服器送發的訊息(私人or群組)
   socketOnEvent(messageEventName.value, handleMessage);
+  // 資料處理
 });
 onBeforeUnmount(() => {
   // 註銷所有事件
