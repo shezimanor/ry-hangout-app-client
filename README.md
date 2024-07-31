@@ -21,7 +21,7 @@ src/
 ├─ stores/
 │   ├─ globalStore.ts        - 使用者狀態管理
 │   ├─ socketStore.ts        - Socket 實例狀態管理
-│   └─ toastStore.ts        - 通知訊息狀態管理
+│   └─ toastStore.ts         - 通知訊息狀態管理
 ├─ views/
 │   ├─ ChatGroupView.vue     - 聊天頁子頁：群組聊天
 │   ├─ ChatPrivateView.vue   - 聊天頁子頁：私訊聊天
