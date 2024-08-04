@@ -137,28 +137,18 @@ onBeforeUnmount(() => {
   <div class="chat-container">
     <div ref="messageContainer" class="message-container">
       <ul class="message-container__list">
-        <li
-          v-for="(message, index) in messageList"
-          :key="index"
-          class="message-container__item"
-          :class="[message.userId === userId ? 'item--end' : 'item--start']"
-        >
-          <!-- 其他人的訊息 -->
-          <template v-if="message.userId !== userId">
-            <span class="message-cotainer__avatar">
-              {{ message.userName.substring(0, 1) }}
-            </span>
-            <div class="message-cotainer__dialog">
-              <span class="message-cotainer__name">{{ message.userName }}</span>
-              <span class="message-cotainer__content">{{ message.content }}</span>
-            </div>
-          </template>
-          <!-- 本人的訊息 -->
-          <template v-else>
-            <div class="message-cotainer__dialog">
-              <span class="message-cotainer__content">{{ message.content }}</span>
-            </div>
-          </template>
+        <li v-for="(message, index) in messageList" :key="index" class="message-container__item">
+          <!-- 訊息結構 -->
+          <span
+            class="message-cotainer__avatar"
+            :class="{ 'avatar--mine': message.userId === userId }"
+          >
+            {{ message.userName.substring(0, 1) }}
+          </span>
+          <div class="message-cotainer__dialog">
+            <span class="message-cotainer__name">{{ message.userName }}</span>
+            <span class="message-cotainer__content">{{ message.content }}</span>
+          </div>
         </li>
       </ul>
     </div>
